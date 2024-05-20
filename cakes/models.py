@@ -1,14 +1,11 @@
 from django.db import models
-# from .help import SaveMediaFile
+from .helpers import Choices
 
 
 class Sweets(models.Model):
     class PriceType(models.TextChoices):
         usd = "$"
         sum = "sum"
-
-
-
 
     name = models.CharField(max_length=50)
     title = models.CharField(max_length=150)
@@ -24,12 +21,16 @@ class Sweets(models.Model):
         return f"{self.title} {self.image}"
 
 
-class Discounts(models.Model):   #Discounts(chegirmalar)
+class Discounts(models.Model): #Discounts(chegirmalar)
+    name = models.CharField(max_length=50)
+    price = models.CharField(max_length=4000)
+    discount_price = models.CharField(max_length=4000)
     title = models.CharField(max_length=100)
     image = models.ImageField(upload_to="cakes/discount/")
-    sweet = models.ManyToManyField(Sweets, null=True, blank=True)
+    sweet = models.ManyToManyField(Sweets, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return f"{self.title}"
@@ -40,15 +41,18 @@ class Discounts(models.Model):   #Discounts(chegirmalar)
 class Masters(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
+    title = models.CharField(max_length=100)
+    slug = models.SlugField(verbose_name="slug", max_length=255)
     image = models.ImageField(upload_to="cakes/masters/")
     Designation = models.CharField(max_length=50)
     telegram_link = models.URLField(null=True, blank=False)
-    type = models.CharField(max_length=20)
+    static = models.CharField(max_length=20, choices=Choices.MastersStatic.choices, default=Choices.MastersStatic.DRAFT)
     discount = models.ManyToManyField(Discounts,  null=True, blank=True)
     instagram_link = models.URLField(null=True, blank=False)
     imail_link = models.URLField(null=True, blank=False)
     created_date = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+    search = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -63,7 +67,7 @@ class Clients(models.Model):
     clients = models.ManyToManyField(Masters,  null=True, blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
-
+    message = models.CharField(max_length=400)
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
